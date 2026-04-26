@@ -276,9 +276,95 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased;
+    background-color: #000000 !important;
+    color: #ffffff !important;
   }
 }
+
+/* ============================================================
+ * Pure black theme override
+ * Force every background to #000 and every text color to #fff,
+ * regardless of the Tailwind utility classes on individual elements.
+ * ============================================================ */
+html,
+body,
+#root {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* All text white */
+*,
+*::before,
+*::after {
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* All backgrounds black, including cards, headers, dialogs, popovers,
+ * inputs, gradients, and any slate / gray / indigo / purple / white shades
+ * used throughout the app. */
+[class*="bg-white"],
+[class*="bg-slate-"],
+[class*="bg-gray-"],
+[class*="bg-zinc-"],
+[class*="bg-neutral-"],
+[class*="bg-stone-"],
+[class*="bg-indigo-"],
+[class*="bg-purple-"],
+[class*="bg-violet-"],
+[class*="bg-blue-"],
+[class*="bg-background"],
+[class*="bg-card"],
+[class*="bg-popover"],
+[class*="bg-muted"],
+[class*="bg-secondary"],
+[class*="bg-accent"],
+[class*="bg-sidebar"],
+[class*="from-"],
+[class*="via-"],
+[class*="to-"] {
+  background-color: #000000 !important;
+  background-image: none !important;
+}
+
+/* Form controls keep a subtle outline so they remain usable on black */
+input,
+textarea,
+select {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Primary buttons stay distinguishable with a thin white border */
+button {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+button:hover,
+[role="button"]:hover,
+a:hover {
+  background-color: #111111 !important;
+}
+
+/* Hover utilities should not flash to a light surface */
+[class*="hover:bg-white"]:hover,
+[class*="hover:bg-slate-"]:hover,
+[class*="hover:bg-gray-"]:hover,
+[class*="hover:bg-indigo-"]:hover {
+  background-color: #111111 !important;
+}
+
+/* Avatars use inline style backgrounds — keep those colorful, but their
+ * fallback text should remain white (already enforced above). */
 
 /**
  * Using the elevate system.
