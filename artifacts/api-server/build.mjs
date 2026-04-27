@@ -19,6 +19,8 @@ async function buildAll() {
     platform: "node",
     bundle: true,
     format: "esm",
+    target: "node18",
+    tsconfig: path.resolve(artifactDir, "tsconfig.json"),
     outdir: distDir,
     outExtension: { ".js": ".mjs" },
     logLevel: "info",
