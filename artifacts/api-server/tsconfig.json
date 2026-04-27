@@ -5,11 +5,9 @@
     "rootDir": "src",
     "types": ["node"],
     "module": "ESNext",
-    "moduleResolution": "Bundler"
+    "moduleResolution": "Bundler",
+    "allowImportingTsExtensions": true,
+    "noEmit": true
   },
-  "include": ["src"],
-  "references": [
-    { "path": "../../lib/db" },
-    { "path": "../../lib/api-zod" }
-  ]
+  "include": ["src"]
 }
