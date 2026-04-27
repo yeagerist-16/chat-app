@@ -36,8 +36,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 app.use("/api", router); // API routes FIRST
 
-app.get('/*', (req, res) => { // Catch-all LAST
+app.get(/(.*)/, (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
-});
 
 export default app;
