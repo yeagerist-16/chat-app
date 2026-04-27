@@ -30,6 +30,8 @@ async function buildAll() {
     external: [
       "*.node",
       "sharp",
+      "@workspace/db",
+      "@workspace/api-zod",
       "better-sqlite3",
       "sqlite3",
       "canvas",
