@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Send, Users, Hash } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatTime, formatDateHeader } from "@/lib/format";
+import { getSocket } from "@/lib/socket";
 
 export default function Room({ roomId }: { roomId: string }) {
   const { user } = useCurrentUser();
@@ -20,28 +21,52 @@ export default function Room({ roomId }: { roomId: string }) {
   const roomQ = useQuery({
     queryKey: ["room", roomId],
     queryFn: () => api.getRoom(roomId),
-    refetchInterval: 10000,
+    refetchInterval: 15000,
   });
   const messagesQ = useQuery({
     queryKey: ["messages", roomId],
     queryFn: () => api.listMessages(roomId),
-    refetchInterval: 2500,
   });
   const membersQ = useQuery({
     queryKey: ["members", roomId],
     queryFn: () => api.listMembers(roomId),
-    refetchInterval: 10000,
+    refetchInterval: 15000,
   });
 
-  const sendMutation = useMutation({
-    mutationFn: (body: string) => api.sendMessage(roomId, user!.id, body),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["messages", roomId] });
+  useEffect(() => {
+    const socket = getSocket();
+    socket.emit("join_room", roomId);
+
+    const onLoad = (payload: { roomId: string; messages: Message[] }) => {
+      if (payload.roomId !== roomId) return;
+      qc.setQueryData<Message[]>(["messages", roomId], payload.messages);
+    };
+
+    const onNew = (msg: Message) => {
+      if (msg.roomId !== roomId) return;
+      qc.setQueryData<Message[]>(["messages", roomId], (prev) => {
+        const list = prev ?? [];
+        if (list.some((m) => m.id === msg.id)) return list;
+        return [...list, msg];
+      });
       qc.invalidateQueries({ queryKey: ["room", roomId] });
       qc.invalidateQueries({ queryKey: ["rooms"] });
       qc.invalidateQueries({ queryKey: ["dashboard-summary"] });
       qc.invalidateQueries({ queryKey: ["recent-activity"] });
-    },
+    };
+
+    socket.on("load_messages", onLoad);
+    socket.on("new_message", onNew);
+
+    return () => {
+      socket.emit("leave_room", roomId);
+      socket.off("load_messages", onLoad);
+      socket.off("new_message", onNew);
+    };
+  }, [roomId, qc]);
+
+  const sendMutation = useMutation({
+    mutationFn: (body: string) => api.sendMessage(roomId, user!.id, body),
   });
 
   useEffect(() => {

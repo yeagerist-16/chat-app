@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import { db, messagesTable, usersTable, roomsTable } from "@workspace/db";
 import { eq, asc } from "drizzle-orm";
 import { SendMessageBodySchema } from "@workspace/api-zod";
+import { emitNewMessage } from "../socket";
 
 const router: IRouter = Router();
 
@@ -68,7 +69,7 @@ router.post("/rooms/:roomId/messages", async (req, res) => {
     .returning();
 
   const u = user[0]!;
-  return res.status(201).json({
+  const payload = {
     id: created!.id,
     roomId: created!.roomId,
     userId: created!.userId,
@@ -76,7 +77,11 @@ router.post("/rooms/:roomId/messages", async (req, res) => {
     userAvatarColor: u.avatarColor,
     body: created!.body,
     createdAt: created!.createdAt.toISOString(),
-  });
+  };
+
+  emitNewMessage(roomId, payload);
+
+  return res.status(201).json(payload);
 });
 
 export default router;
